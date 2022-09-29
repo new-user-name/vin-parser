@@ -17,18 +17,21 @@ class LoginToM {
     private bool|\CurlHandle $ch;
 
     function firstString() {
-        $url = "https://gapiprod.awsmlogic.manheim.com/oauth/login";
-        curl_setopt($this->ch, CURLOPT_URL, $url);
+        //curl_setopt($this->ch, CURLOPT_URL, "https://mmr.{$this->c['word1']}.com/?WT.svl=m_uni_hdr_buy&country=US&popup=true&source=man");
+        //https://mmr.manheim.com/?WT.svl=m_uni_hdr_buy&country=US&popup=true&source=man
+        curl_setopt($this->ch, CURLOPT_URL, "https://members.{$this->c['word1']}.com/gateway/login");
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->getChromeHeaders());
-        curl_setopt($this->ch, CURLOPT_REFERER, "https://mmr.manheim.com/");
+
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'GET');
+
         curl_setopt($this->ch, CURLOPT_COOKIEJAR, 'cookies.txt');
         curl_setopt($this->ch, CURLOPT_COOKIEFILE, 'cookies.txt');
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, TRUE);
-        curl_setopt($this->ch, CURLOPT_MAXREDIRS, 1);
+        curl_setopt($this->ch, CURLOPT_MAXREDIRS, 0);
 
-        return curl_exec($this->ch);
+        curl_exec($this->ch);
 
-     //   return (curl_getinfo($this->ch)['redirect_url']);
+        return (curl_getinfo($this->ch)['redirect_url']);
     }
 
     function secondString($url): bool|string {
@@ -52,17 +55,17 @@ class LoginToM {
             "pf.usernamerecovery" => "",
             "pf.adapterId" => "{$this->c['Word1']}DirectoryFA",
             "brand_logo" => "assets/images/{$this->c['word1']}Logo.svg",
-            "brand_href" => "https://www.manheim.com",
+            "brand_href" => "false",
             "brand_name" => "{$this->c['word1']}",
             "signup" => "{$this->c['word1']}",
             "reset_pw_mode" => "forgot",
             "exit_target_url" => "https://www.{$this->c['word1']}.com"
         ];
 
-        curl_setopt($this->ch, CURLOPT_REFERER, "https://api.{$this->c['word1']}.com/");
+        curl_setopt($this->ch, CURLOPT_REFERER, "https://mmr.{$this->c['word1']}.com/");
 
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, TRUE);
-        curl_setopt($this->ch, CURLOPT_MAXREDIRS, 0);
+        curl_setopt($this->ch, CURLOPT_MAXREDIRS, 1);
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($this->ch, CURLOPT_POSTFIELDS,
             http_build_query($arrayToUpload));
@@ -81,14 +84,12 @@ class LoginToM {
 
     function fourthString($url) {
         curl_setopt($this->ch, CURLOPT_URL, $url);
-
-        curl_setopt($this->ch, CURLOPT_HTTPGET, true);
-        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->getChromeHeaders(['Cache-Control: max-age=0']));
         curl_setopt($this->ch, CURLOPT_REFERER, "https://api.{$this->c['word1']}.com/");
 
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, TRUE);
-        curl_setopt($this->ch, CURLOPT_MAXREDIRS, 0);
+        curl_setopt($this->ch, CURLOPT_MAXREDIRS, 1);
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'GET');
 
         curl_exec($this->ch);
         return (curl_getinfo($this->ch)['redirect_url']);
@@ -123,10 +124,11 @@ class LoginToM {
 
         $this->ch = $this->initCurl();
 
-        $pageWithLoginFormHTML = $this->firstString();
-        $nextURL = $this->makeLoginPage($pageWithLoginFormHTML);
-        $location2 = $this->thirdString($nextURL); //going to https://api.mmm.com/as/{NE6bp}/resume/as/authorization.ping
-        $mmr = $this->fourthString($location2); // after this we are on the main page, nick is visible in page source
+        $location = $this->firstString();
+        $loginPageHTML = $this->secondString($location);
+        $loginPage = $this->makeLoginPage($loginPageHTML);
+        $location2 = $this->thirdString($loginPage); //going to https://api.mmm.com/as/{NE6bp}/resume/as/authorization.ping
+        $this->fourthString($location2); // after this we are on the main page, nick is visible in page source
 
         //https://mmr.manheim.com/?WT.svl=m_uni_hdr_buy&country=US&popup=true&source=man
 
