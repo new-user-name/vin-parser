@@ -1,5 +1,9 @@
 <?php
 
+namespace Hippo\Parser\Swap;
+
+use DOMDocument;
+use DOMXPath;
 
 class ParseCarPage
 {
@@ -58,10 +62,10 @@ class ParseCarPage
         return $pictures;
     }
 
-    function __construct($carUrl)
+    function __construct($carUrl, $secretWord)
     {
         $html = new DOMDocument();
-        $html->loadHTMLFile("https://www.{$this->c['word2']}.com" . $carUrl);
+        $html->loadHTMLFile("https://www.$secretWord.com" . $carUrl);
         $this->xpathObject = new DOMXPath($html);
     }
 }

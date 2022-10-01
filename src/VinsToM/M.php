@@ -1,41 +1,36 @@
 <?php
 
-include 'getChromeHeaders.php';
-include 'Tokens.php';
-include_once '../Utils/initCurl.php';
-include '../LoginToM/LoginToManheim.php';
-include '../Utils/utils.php';
+namespace Hippo\Parser\VinsToM;
 
-use function Parser\VinsToManheim\getChromeHeaders;
-use function Hippo\Parser\Utils\initCurl;
+
+use Hippo\Parser\LoginToM\LoginToM;
+use Hippo\Parser\Utils\InitCurl;
+use JetBrains\PhpStorm\Pure;
+
 use function Hippo\Parser\Utils\singleInBetween;
+use function Parser\VinsToM\getChromeHeaders;
 
-class M
-{
+class M {
+
+    use InitCurl;
     private $ch, $vin, $href, $mileage, $tokens;
 
-    private function initialUpdateCurl()
-    {
+    private function initialUpdateCurl() {
         curl_setopt($this->ch, CURLOPT_ENCODING, 'gzip, deflate');
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, getChromeHeaders($this->tokens->Bearer()));
     }
 
-    private function updateCurl($href)
-    {
-        $innerJson = array("bearer_token" => $this->tokens->bearer_token(), "href" => $href);
-        $innerJsonArray = array($innerJson);
-        $outerJsonArray = array("requests" => $innerJsonArray);
-        $json = json_encode($outerJsonArray);
+    private function updateCurl($href) {
+        $innerJsonArray = [["bearer_token" => $this->tokens->bearer_token(), "href" => $href]];
+        $json = json_encode(["requests" => $innerJsonArray]);
         curl_setopt($this->ch, CURLOPT_POSTFIELDS, $json);
     }
 
-    function releaseCh()
-    {
+    function releaseCh() {
         curl_close($this->ch);
     }
 
-    function getLinkToMMR(): string
-    {
+    #[Pure] function getLinkToMMR(): string {
         if ($this->href == "no VIN in MMR")
             return "No data";
         else {
@@ -45,8 +40,7 @@ class M
         }
     }
 
-    function getAdjustedMMR($mileage): string
-    {
+    function getAdjustedMMR($mileage): string {
         if ($this->href == "no VIN in MMR")
             return "No data";
         else {
@@ -64,25 +58,26 @@ class M
         }
     }
 
-    function __construct(string $vin)
-    {
+    function __construct(string $vin) {
         //$vin = "SALWS2RU0NA202028"; example of a wrong vin
+        // 7SAYGAEEXNF363538 good vin
         $this->vin = $vin;
 
         if ($this->ch == null) {
-            $this->ch = initCurl();
+            $this->ch = $this->initCurl();
             $this->tokens = new Tokens();
             $this->initialUpdateCurl();
         }
 
         curl_setopt($this->ch, CURLOPT_URL, 'https://gapiprod.awsmlogic.manheim.com/gateway');
-        $href = "https://api.manheim.com/valuations/vin/$vin?country=US&include=retail,historical,forecast&orgId=stnemtsov";
+        //$href = "https://api.manheim.com/listings/vin/$vin?fields=id%2Cmid%2Cvin%2CpickupLocation%2CpickupRegion%2CpickupLocationCountry%2Cchannels%2Ccurrency%2Cstatuses%2CconditionGradeNumeric%2Codometer%2CodometerUnits%2Ctrims%2CexteriorColor%2CyearId%2CmakeId%2CmodelIds%2Cyear%2Cmake%2Cmodels%2ChasAutocheck%2CautocheckCsHash%2CisEligibleForCarfax%2CcarfaxCsHash%2CsellerNumber%2CmmrPrice%2CbidPrice%2CisAutoGradeOrManheimGrade&include=true";
+        $href="https://api.manheim.com/valuations/vin/$vin?country=US&include=retail,historical,forecast";
         $this->updateCurl($href);
 
         $tokenIsGood = null;
         do {
             $result = curl_exec($this->ch);
-            if (str_contains($result, "Matching vehicles not found")) {
+            if (str_contains($result, "listing not found")) {
                 $this->href = "no VIN in MMR";
             } else {
                 $buff = json_decode($result);
@@ -91,7 +86,7 @@ class M
             if ($this->href == null) {
                 $tokenIsGood = False;
                 echo "New login to Manheim", PHP_EOL;
-                new LoginToManheim();
+                new LoginToM();
                 $this->tokens = new Tokens();
                 $this->initialUpdateCurl();
             } else

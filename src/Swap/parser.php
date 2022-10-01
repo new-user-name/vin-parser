@@ -2,22 +2,23 @@
 
 declare(strict_types=1);
 
+require '../../vendor/autoload.php';
+
+use Hippo\Parser\Swap\ParseCarPage;
+use Hippo\Parser\Swap\SwapLinkProcessor;
+use Hippo\Parser\VinsToM\M;
+
 const PAGES_TO_PARSE = 1;
 
-// the mail address has to be set in two separate places: here and in the parser.cron
+// the mail address has to be set in two separate places:
+// here and in the parser.cron
 const MAIL_ADDRESS = "jeff.bishop275@gmail.com";
 
 chdir(dirname(__FILE__));
 error_reporting(E_ERROR);
 
-include 'ParseCarPage.php';
-include 'SwapLinkProcessor.php';
-include '../VinsToM/Manheim.php';
 
-include 'LogUtils.php';
-
-function getGoodCarLinksFromPage(string $url): array
-{
+function getGoodCarLinksFromPage(string $url): array {
 
     $html = new DOMDocument();
 
@@ -38,22 +39,20 @@ function getGoodCarLinksFromPage(string $url): array
     return $links;
 }
 
-function getPageAddressByNumber(int $pageNumber): string
-{
+function getPageAddressByNumber(int $pageNumber, string $secretWord): string {
     if ($pageNumber == 1)
-        return "https://www.{$this->c['word2']}.com/lease/search.aspx?so=5&ipg=60";
+        return "https://www.$secretWord.com/lease/search.aspx?so=5&ipg=60";
     else
-        return "https://www.{$this->c['word2']}.com/lease/search.aspx?page=$pageNumber&so=5&ipg=60";
+        return "https://www.$secretWord.com/lease/search.aspx?page=$pageNumber&so=5&ipg=60";
 }
 
-function goodNews()
-{
+function goodNews() {
     static $mail_sent_already = false;
 
     if (!$mail_sent_already) {
         $to = MAIL_ADDRESS;
-        $subject = 'New cars on {$this->c['Word2']}';
-        $message = 'New cars have been listed on {$this->c['Word2']}, please check your database';
+        $subject = 'New cars on Mnhm';
+        $message = 'New cars have been listed on Mnhm, please check your database';
         $headers = 'From: webmaster@example.com' . "\r\n" .
             'Reply-To: webmaster@example.com' . "\r\n" .
             'X-Mailer: PHP/' . phpversion();
@@ -63,18 +62,17 @@ function goodNews()
 }
 
 
-
 date_default_timezone_set('Europe/Kiev');
 
 $today = date("F j, Y, g:i a");
 
-$manheim = null; // Manheim object
-
+$mnhm = null; // Mnhm object
 $conn = null; //Database
 
 $db = parse_ini_file("../Utils/db.ini");
-$conn = new PDO("mysql:host={$db['servername']};dbname={$db['dbname']}", $db['username'], $db['password']);
+$c = parse_ini_file("../../config.ini");
 
+$conn = new PDO("mysql:host={$db['servername']};dbname={$db['dbname']}", $db['username'], $db['password']);
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 WriteInitialNumberOfCarsAndClearLog($conn, $today);
@@ -84,7 +82,7 @@ $singleArrayOfCars = array();
 for ($pageNumber = 1; $pageNumber <= PAGES_TO_PARSE; $pageNumber++) {
 // Pages start from 1, not 0.
     echo "Parsing root page $pageNumber", PHP_EOL;
-    $pageAddress = getPageAddressByNumber($pageNumber);
+    $pageAddress = getPageAddressByNumber($pageNumber, $c['word2']);
 
 // go to the page with multiple cars
     $goodCarLinksFromPage = getGoodCarLinksFromPage($pageAddress);
@@ -110,8 +108,8 @@ for ($pageNumber = 1; $pageNumber <= PAGES_TO_PARSE; $pageNumber++) {
 for ($linkNumber = count($singleArrayOfCars) - 1; $linkNumber >= 0; $linkNumber--) {
 
 // go to the page of a single car
-    $parsedPage = new ParseCarPage("/lease/details/2022-Land-Rover-Defender.aspx?salid=1573514");
-//    $parsedPage = new ParseCarPage($singleArrayOfCars[$linkNumber]->getLink());
+    //   $parsedPage = new ParseCarPage("/lease/details/2022-Land-Rover-Defender.aspx?salid=1573514");
+    $parsedPage = new ParseCarPage($singleArrayOfCars[$linkNumber]->getLink(), $c['word2']);
     $mileage = $parsedPage->getMileage();
 
     if ($mileage != "0") { // we don't need cars with zero mileage
@@ -130,9 +128,9 @@ for ($linkNumber = count($singleArrayOfCars) - 1; $linkNumber >= 0; $linkNumber-
         $linkToMMR = "No data";
 
         if ($vin != "no VIN") {
-            $manheim = new Manheim($vin);
-            $adjustedMMR = $manheim->getAdjustedMMR($mileage);
-            $linkToMMR = $manheim->getLinkToMMR();
+            $mnhm = new M($vin);
+            $adjustedMMR = $mnhm->getAdjustedMMR($mileage);
+            $linkToMMR = $mnhm->getLinkToMMR();
         }
 
         try {
@@ -174,12 +172,12 @@ for ($linkNumber = count($singleArrayOfCars) - 1; $linkNumber >= 0; $linkNumber-
         echo "Zero mileage skipped, link $linkNumber", PHP_EOL;
 }
 
-WriteFinalNumberOfCars($conn, $today);
+WriteFinalNumberOfCars($conn, $today, $c['word2']);
 
 $conn = null;
 
-if ($manheim != null)
-    $manheim->releaseCh();
+if ($mnhm != null)
+    $mnhm->releaseCh();
 
 
 

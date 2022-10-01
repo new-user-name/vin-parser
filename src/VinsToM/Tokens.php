@@ -1,5 +1,6 @@
 <?php
 
+namespace Hippo\Parser\VinsToM;
 
 class Tokens
 {

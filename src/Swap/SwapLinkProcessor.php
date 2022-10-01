@@ -1,5 +1,6 @@
 <?php
 
+namespace Hippo\Parser\Swap;
 
 class SwapLinkProcessor
 {

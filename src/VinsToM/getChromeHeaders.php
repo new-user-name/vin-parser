@@ -1,8 +1,8 @@
 <?php
-namespace Parser\VinsToManheim;
 
-function getChromeHeaders(string $Bearer) : array
-{
+namespace Parser\VinsToM;
+
+function getChromeHeaders(string $Bearer): array {
     return [
         'Authority: gapiprod.awsmlogic.manheim.com',
         'Sec-Ch-Ua: ^^Google',

@@ -6,6 +6,12 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit28dea433fc5b3d5474626f5d92e2a268
 {
+    public static $files = array (
+        '08735baa0a3e8dc3dde8956eea25140d' => __DIR__ . '/../..' . '/src/swap/LogUtils.php',
+        '48a3ed4d0ab9b6a7dccf80ddb6f46c9e' => __DIR__ . '/../..' . '/src/VinsToM/getChromeHeaders.php',
+        '6c7abcd3ae0f3de2aefa2c0522b39566' => __DIR__ . '/../..' . '/src/Utils/Utils.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
         'H' => 
         array (

@@ -1,20 +1,27 @@
 {
-    "name": "hippo/parser",
-    "description": "secret parser",
-    "type": "project",
-    "license": "none",
-    "autoload": {
-        "psr-4": {
-            "Hippo\\Parser\\": "src/"
-        }
+  "name": "hippo/parser",
+  "description": "secret parser",
+  "type": "project",
+  "license": "none",
+  "autoload": {
+    "psr-4": {
+      "Hippo\\Parser\\": "src/"
     },
-    "authors": [
-        {
-            "name": "new-user-name",
-            "email": "latexpostcard@gmail.com"
-        }
-    ],
-    "require": {
-      "ext-curl": "*"
+    "files": [
+      "src/swap/LogUtils.php",
+      "src/VinsToM/getChromeHeaders.php",
+      "src/Utils/Utils.php"
+    ]
+  },
+  "authors": [
+    {
+      "name": "new-user-name",
+      "email": "latexpostcard@gmail.com"
     }
+  ],
+  "require": {
+    "ext-curl": "*",
+    "ext-dom": "*",
+    "ext-pdo": "*"
+  }
 }

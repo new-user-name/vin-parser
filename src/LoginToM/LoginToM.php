@@ -3,15 +3,13 @@
 declare(strict_types=1);
 
 namespace Hippo\Parser\LoginToM;
-require_once('../../vendor/autoload.php');
 
 use Hippo\Parser\Utils\InitCurl;
-use Hippo\Parser\Utils\Utils;
 use JetBrains\PhpStorm\Pure;
+use function Hippo\Parser\Utils\singleInBetween;
 
 class LoginToM {
     use InitCurl;
-    use Utils;
 
     private array|false $c;
     private bool|\CurlHandle $ch;
@@ -28,18 +26,9 @@ class LoginToM {
 
         return curl_exec($this->ch);
 
-     //   return (curl_getinfo($this->ch)['redirect_url']);
     }
 
-    function secondString($url): bool|string {
-        curl_setopt($this->ch, CURLOPT_URL, $url);
-        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, TRUE);
-        curl_setopt($this->ch, CURLOPT_MAXREDIRS, 0);
-        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'GET');
-        return curl_exec($this->ch);
-    }
-
-    function thirdString($url) {
+    function secondString($url) {
 
         curl_setopt($this->ch, CURLOPT_URL, $url);
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->getChromeHeaders());
@@ -75,11 +64,11 @@ class LoginToM {
     }
 
     #[Pure] private function makeLoginPage(bool|string $loginPageHTML): string {
-        $cut = $this->singleInBetween($loginPageHTML, '/as/', '/resume/');
+        $cut = singleInBetween($loginPageHTML, '/as/', '/resume/');
         return "https://api.{$this->c['word1']}.com/as/$cut/resume/as/authorization.ping";
     }
 
-    function fourthString($url) {
+    function thirdString($url) {
         curl_setopt($this->ch, CURLOPT_URL, $url);
 
         curl_setopt($this->ch, CURLOPT_HTTPGET, true);
@@ -96,10 +85,8 @@ class LoginToM {
 
     function beforeMMR() {
         $url = "https://gapiprod.awsmlogic.{$this->c['word1']}.com/oauth/refresh";
-//https://mmr.manheim.com/?WT.svl=m_uni_hdr_buy&country=US&popup=true&source=man
         curl_setopt($this->ch, CURLOPT_URL, $url);
         curl_setopt($this->ch, CURLOPT_REFERER, "https://mmr.manheim.com/");
-//        curl_setopt($this->ch, CURLOPT_POSTFIELDS,false);
         curl_setopt($this->ch, CURLOPT_HTTPGET, true);
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->getChromeHeaders(
             [
@@ -107,8 +94,8 @@ class LoginToM {
                 'Origin: https://mmr.manheim.com',
                 'Host: gapiprod.awsmlogic.manheim.com'
             ]));
-        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, TRUE);
-        curl_setopt($this->ch, CURLOPT_MAXREDIRS, 1);
+        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, FALSE);
+        curl_setopt($this->ch, CURLOPT_MAXREDIRS, 0);
         $res = curl_exec($this->ch);
 
         $fp = fopen('tokens.json', 'w');
@@ -125,8 +112,8 @@ class LoginToM {
 
         $pageWithLoginFormHTML = $this->firstString();
         $nextURL = $this->makeLoginPage($pageWithLoginFormHTML);
-        $location2 = $this->thirdString($nextURL); //going to https://api.mmm.com/as/{NE6bp}/resume/as/authorization.ping
-        $mmr = $this->fourthString($location2); // after this we are on the main page, nick is visible in page source
+        $location2 = $this->secondString($nextURL); //going to https://api.mmm.com/as/{NE6bp}/resume/as/authorization.ping
+        $this->thirdString($location2); // after this we are on the main page, nick is visible in page source
 
         //https://mmr.manheim.com/?WT.svl=m_uni_hdr_buy&country=US&popup=true&source=man
 
@@ -136,7 +123,6 @@ class LoginToM {
 
         echo "Tokens saved", PHP_EOL;
     }
-
 }
 
-new LoginToM();
+//new LoginToM();

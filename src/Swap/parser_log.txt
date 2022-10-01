@@ -105,3 +105,36 @@ Started with 0 records, September 22, 2022, 9:50 pm
 Started with 0 records, September 22, 2022, 9:51 pm
 Started with 0 records, September 22, 2022, 10:06 pm
 Started with 0 records, September 22, 2022, 10:08 pm
+Started with 0 records, September 29, 2022, 8:41 pm
+Started with 0 records, September 29, 2022, 8:43 pm
+Stopped with 0 records, September 29, 2022, 8:43 pm
+
+Started with 0 records, September 29, 2022, 8:44 pm
+Started with 0 records, September 29, 2022, 8:45 pm
+Started with 0 records, September 29, 2022, 8:47 pm
+Started with 0 records, September 29, 2022, 8:47 pm
+Started with 0 records, September 29, 2022, 8:48 pm
+Started with 0 records, September 29, 2022, 8:52 pm
+Started with 0 records, September 29, 2022, 8:54 pm
+Started with 0 records, September 29, 2022, 8:55 pm
+Stopped with 60 records, September 29, 2022, 8:55 pm
+
+Started with 60 records, September 29, 2022, 8:56 pm
+Stopped with 60 records, September 29, 2022, 8:56 pm
+
+Started with 0 records, September 29, 2022, 8:57 pm
+Started with 0 records, September 29, 2022, 9:00 pm
+Started with 0 records, September 29, 2022, 9:03 pm
+Started with 9 records, September 30, 2022, 7:49 pm
+Started with 0 records, September 30, 2022, 7:53 pm
+Started with 0 records, September 30, 2022, 7:56 pm
+Started with 0 records, September 30, 2022, 8:01 pm
+Started with 0 records, October 1, 2022, 12:49 am
+Started with 0 records, October 1, 2022, 12:51 am
+Started with 0 records, October 1, 2022, 1:40 am
+Started with 0 records, October 1, 2022, 2:00 am
+Started with 0 records, October 1, 2022, 2:03 am
+Started with 0 records, October 1, 2022, 2:07 am
+Started with 0 records, October 1, 2022, 2:11 am
+Stopped with 4 records, October 1, 2022, 2:11 am
+

@@ -12,8 +12,8 @@ function WriteInitialNumberOfCarsAndClearLog($conn, $today){
     file_put_contents("parser_log.txt", "Started with ". $numberOfRows. " records, ". $today. PHP_EOL, FILE_APPEND);
 }
 
-function WriteFinalNumberOfCars($conn, $today){
+function WriteFinalNumberOfCars($conn, $today, $secretWord){
     $numberOfRows = GetNumberOfRows($conn);
-    $file = "/home/Parser/{$this->c['Word2']}/parser_log.txt";
+    $file = "/home/Parser/$secretWord/parser_log.txt";
     file_put_contents("parser_log.txt", "Stopped with ". $numberOfRows. " records, ". $today. PHP_EOL. PHP_EOL, FILE_APPEND);
 }
